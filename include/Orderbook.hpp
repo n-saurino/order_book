@@ -75,22 +75,17 @@ public:
         // check if front order of bids or asks is larger
         // decrement each order's quantity by the smaller of the two
         // if one order is 0, remove it from the book
-        
-        if(ask_it->quantity_ == bid_it->quantity_){
-            // order quantities are equal
-            // need to decrement both and remove them from the book
+        int fill_qty{std::min(ask_it->quantity_, bid_it->quantity_)}; 
+        ask_it->quantity_ -= fill_qty;
+        bid_it->quantity_ -= fill_qty;
 
-        }else if(ask_it->quantity_ > bid_it->quantity_){
-            // asks order quantity > bid order quantity
-            // need to decrement both and remove bid from book
-
-        }else{
-            // asks order quantity < bid order quantity
-            // need to decrement both and remove ask from book
-
+        if(!ask_it->quantity_){
+            asks_[ask_it->price_].erase(ask_it);
         }
-
         
+        if(!bid_it->quantity_){
+            bids_[bid_it->price_].erase(bid_it);
+        }
     }
 
     void Modify(const Order& old_order, const Order& modify_order){
@@ -104,11 +99,15 @@ public:
     void Match(){
         // need to loop while we have overlapping prices
         // call fill on the first two orders
-        // 
+        if(asks_.empty() || bids_.empty()){
+            return;
+        }
+
         auto asks_it{asks_.begin()};
         auto bids_it{bids_.begin()};
         
-        while(asks_it->first <= bids_it->first){
+        while(!asks_.empty() && !bids_.empty()
+              && asks_it->first <= bids_it->first){
             // call fill
             Fill(asks_it->second.begin(), bids_it->second.begin());
 
@@ -124,8 +123,9 @@ public:
         }
     }
     
-private:
     std::unordered_map<OrderId, std::list<Order>::iterator> orders_{};
     std::map<Price, std::list<Order>, std::greater<Price>> asks_{};
     std::map<Price, std::list<Order>, std::less<Price>> bids_{};
+
+private:
 };
