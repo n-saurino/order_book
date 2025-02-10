@@ -2,6 +2,7 @@
 #include <list>
 #include <unordered_map>
 #include <map>
+#include <string_view>
 
 enum Side{
     BID,
@@ -18,8 +19,17 @@ struct Order{
     Price price_{};
     Quantity quantity_{};    
     Side side_{};
-};
 
+    friend std::ostream& operator<<(std::ostream& out, const Order& order){
+        out << "[id: " << order.order_id_ 
+            << ", side: " << (order.side_ == BID ? "BID" : "ASK")
+            << ", price: " << order.price_
+            << ", qty: " << order.quantity_ << "]";
+        
+        return out;
+    }
+
+};
 
 
 class Orderbook{
@@ -123,9 +133,39 @@ public:
         }
     }
     
+    void Print(){
+        for(auto asks_it{asks_.rbegin()}; asks_it != asks_.rend(); ++asks_it){
+            std::cout << asks_it->first << ": ";
+            int count{};
+            for(auto order : asks_it->second){
+                if(count){
+                    std::cout << " -> ";
+                }
+                std::cout << order;
+                ++count;
+            }
+            std::cout << "\n";
+        }
+
+        std::cout << "-------\n";
+
+        for(auto bids_it{bids_.begin()}; bids_it != bids_.end(); ++bids_it){
+            std::cout << bids_it->first << ": ";
+            int count{};
+            for(auto order : bids_it->second){
+                if(count){
+                    std::cout << " -> ";
+                }
+                std::cout << order;
+                ++count;
+            }
+            std::cout << "\n";
+        }
+    }
+    
     std::unordered_map<OrderId, std::list<Order>::iterator> orders_{};
-    std::map<Price, std::list<Order>, std::greater<Price>> asks_{};
-    std::map<Price, std::list<Order>, std::less<Price>> bids_{};
+    std::map<Price, std::list<Order>, std::less<Price>> asks_{};
+    std::map<Price, std::list<Order>, std::greater<Price>> bids_{};
 
 private:
 };

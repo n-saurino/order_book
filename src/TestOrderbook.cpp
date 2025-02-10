@@ -114,7 +114,7 @@ TEST_F(OrderbookTest, OrderSorting) {
     orderbook.Add(bid2);
     orderbook.Add(ask1);
     orderbook.Add(ask2);
-
+    
     EXPECT_EQ(orderbook.bids_.begin()->first, 105);
     EXPECT_EQ(orderbook.asks_.begin()->first, 110);
 }
