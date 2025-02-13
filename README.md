@@ -1,4 +1,4 @@
-# LeetCode-Style Question: Implement a Simple Order Book in C++
+# Implement a Simple Order Book in C++
 
 **Difficulty:** Medium-Hard  
 **Tags:** C++, Data Structures, Heap, Multimap, Simulation
